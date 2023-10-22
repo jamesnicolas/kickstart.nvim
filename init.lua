@@ -190,36 +190,38 @@ require('lazy').setup({
   },
 
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
+    'folke/tokyonight.nvim',
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      vim.cmd('colorscheme tokyonight-storm')
     end,
   },
 
   {
     -- Set lualine as statusline
-    'nvim-lualine/lualine.nvim',
+    -- I wanted the count of the synbol to come before the symbol, so I forked it.
+    -- We could make it configurable but I don't think anyone else wants this
+    'jamesnicolas/lualine.nvim',
+    -- 'nvim-lualine/lualine.nvim',
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'onedark',
-        component_separators = '|',
-        section_separators = '',
+        theme = 'tokyonight',
       },
+
+      sections = {
+        lualine_b = {
+          'branch',
+          'diff',
+          {
+            'diagnostics',
+            symbols = {error = '死', warn = '怖', info = '知', hint = '示'},
+          }
+        }
+      }
     },
   },
-
-  {
-    -- Add indentation guides even on blank lines
-    'lukas-reineke/indent-blankline.nvim',
-    -- Enable `lukas-reineke/indent-blankline.nvim`
-    -- See `:help ibl`
-    main = 'ibl',
-    opts = {},
-  },
+  'nvim-tree/nvim-web-devicons',
 
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
@@ -584,6 +586,11 @@ local servers = {
     },
   },
 }
+-- make our diagnostics すごい
+vim.fn.sign_define("DiagnosticSignError", {text = "死", texthl = "DiagnosticSignError", linehl = "", numhl = ""})
+vim.fn.sign_define("DiagnosticSignWarn", {text = "怖", texthl = "DiagnosticSignWarn", linehl = "", numhl = ""})
+vim.fn.sign_define("DiagnosticSignInfo", {text = "知", texthl = "DiagnosticSignInfo", linehl = "", numhl = ""})
+vim.fn.sign_define("DiagnosticSignHint", {text = "示", texthl = "DiagnosticSignHint", linehl = "", numhl = ""})
 
 -- Setup neovim lua configuration
 require('neodev').setup()
