@@ -587,10 +587,10 @@ local servers = {
   },
 }
 -- make our diagnostics すごい
-vim.fn.sign_define("DiagnosticSignError", {text = "死", texthl = "DiagnosticSignError", linehl = "", numhl = ""})
-vim.fn.sign_define("DiagnosticSignWarn", {text = "怖", texthl = "DiagnosticSignWarn", linehl = "", numhl = ""})
-vim.fn.sign_define("DiagnosticSignInfo", {text = "知", texthl = "DiagnosticSignInfo", linehl = "", numhl = ""})
-vim.fn.sign_define("DiagnosticSignHint", {text = "示", texthl = "DiagnosticSignHint", linehl = "", numhl = ""})
+vim.fn.sign_define("DiagnosticSignError", {text = "死", texthl = "DiagnosticSignError"})
+vim.fn.sign_define("DiagnosticSignWarn", {text = "怖", texthl = "DiagnosticSignWarn"})
+vim.fn.sign_define("DiagnosticSignInfo", {text = "知", texthl = "DiagnosticSignInfo"})
+vim.fn.sign_define("DiagnosticSignHint", {text = "示", texthl = "DiagnosticSignHint"})
 
 -- Setup neovim lua configuration
 require('neodev').setup()
