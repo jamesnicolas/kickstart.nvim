@@ -148,6 +148,7 @@ require('lazy').setup({
       end,
     },
   },
+  'mbbill/undotree',
 
   {
     'folke/tokyonight.nvim',
@@ -274,6 +275,9 @@ vim.o.termguicolors = true
 
 -- Set default tabstop to 4
 vim.o.tabstop = 4
+vim.o.shiftwidth = 0
+
+vim.o.relativenumber = true
 
 -- [[ Basic Keymaps ]]
 
@@ -313,6 +317,7 @@ require('telescope').setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ['<CR>'] = require('telescope.actions').select_default + require('telescope.actions').center
       },
     },
   },
