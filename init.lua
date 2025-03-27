@@ -11,7 +11,9 @@ vim.g.maplocalleader = ' '
 vim.opt.number = true
 -- You can also add relative line numbers, for help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
+
+vim.g.python3_host_prog = '/Users/jnicolas_1/.pyenv/shims/python3'
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -135,8 +137,26 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  { 'NMAC427/guess-indent.nvim', opts = {} }, -- Detect tabstop and shiftwidth automatically
 
+  {
+    'olimorris/codecompanion.nvim',
+    opts = {
+      strategies = {
+        inline = { adapter = 'copilot' },
+        chat = { adapter = 'copilot' },
+      },
+      display = {
+        diff = {
+          layout = 'vertical',
+          provider = 'mini_diff',
+          opts = { 'internal', 'filler', 'closeoff', 'algorithm:patience', 'followwrap', 'linematch:120' },
+        },
+      },
+    },
+  },
+  'github/copilot.vim',
+  { 'echasnovski/mini.diff', opts = {} },
   'tpope/vim-fugitive',
   'tpope/vim-rhubarb',
   -- NOTE: Plugins can also be added by using a table,
@@ -413,6 +433,8 @@ require('lazy').setup {
           --  For example, in C this would take you to the header
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+          map('gy', vim.lsp.buf.type_definition, '[G]oto T[y]pe')
+
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -453,8 +475,16 @@ require('lazy').setup {
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
-        -- pyright = {},
+        gopls = {},
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                reportUnusedExpression = false,
+              },
+            },
+          },
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -763,10 +793,23 @@ vim.fn.sign_define('DiagnosticSignInfo', { text = '知', texthl = 'DiagnosticSig
 vim.fn.sign_define('DiagnosticSignHint', { text = '示', texthl = 'DiagnosticSignHint' })
 
 -- pane navigation
-vim.keymap.set({ 'n', 't' }, '<M-h>', '<CMD>NavigatorLeft<CR>')
-vim.keymap.set({ 'n', 't' }, '<M-l>', '<CMD>NavigatorRight<CR>')
-vim.keymap.set({ 'n', 't' }, '<M-k>', '<CMD>NavigatorUp<CR>')
-vim.keymap.set({ 'n', 't' }, '<M-j>', '<CMD>NavigatorDown<CR>')
+vim.keymap.set({ 'n', 't' }, '<M-h>', function()
+  vim.cmd 'NavigatorLeft'
+end)
+vim.keymap.set({ 'n', 't' }, '<M-l>', function()
+  vim.cmd 'NavigatorRight'
+end)
+vim.keymap.set({ 'n', 't' }, '<M-k>', function()
+  vim.cmd 'NavigatorUp'
+end)
+vim.keymap.set({ 'n', 't' }, '<M-j>', function()
+  vim.cmd 'NavigatorDown'
+end)
+
+vim.keymap.set({ 'n', 't' }, '<M-p>', function()
+  vim.notify 'p pressed'
+  vim.cmd 'NavigatorUp'
+end)
 
 -- other navigation
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -781,5 +824,20 @@ vim.keymap.set('n', '[f', ':N<CR>zz')
 vim.keymap.set('n', ']F', ':wn<CR>zz')
 vim.keymap.set('n', '[F', ':wN<CR>zz')
 
+-- General/Global LSP Configuration
+local api = vim.api
+local lsp = vim.lsp
+
+local make_client_capabilities = lsp.protocol.make_client_capabilities
+function lsp.protocol.make_client_capabilities()
+  local caps = make_client_capabilities()
+  if not (caps.workspace or {}).didChangeWatchedFiles then
+    vim.notify('lsp capability didChangeWatchedFiles is already disabled', vim.log.levels.WARN)
+  else
+    caps.workspace.didChangeWatchedFiles = nil
+  end
+
+  return caps
+end
+
 -- vim: ts=2 sts=2 sw=2 et
---
